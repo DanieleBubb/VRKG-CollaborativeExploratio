@@ -1,10 +1,14 @@
 # VRKG-CollaborativeExploration
 A Virtual Reality multi-user application for Meta Quest Pro to collaboratively import, discuss and interact with a fully 3D representation of a Knowledge Graph
 
+The project is divided in two parts: 
+* UnityProject: The VR Application that imports and visualizes the knowledge graphs
+* WebApp: The source code of the web application that allow users to populate the public repository with SPARQL query results, that can then be imported by the Virtual Reality Application
+
 ## How to use
 
 * Download Unity 2021.3.2f1, including the Android module
-* Import the project from the repository
+* Import the project located at the "UnityProject" folder of this repository
 * Attach a Meta Quest to the pc via USB
 * Open the Build Settings window
 * Switch the build target to Android

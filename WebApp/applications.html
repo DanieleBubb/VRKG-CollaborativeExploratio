@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Knowledge Graph Metaverse</title>
+  <link href="bitnami.css" media="all" rel="Stylesheet" type="text/css" /> 
+  <link href="/dashboard/stylesheets/all.css" rel="stylesheet" type="text/css" />
+  <script src = "https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin = "anonymous" referrerpolicy = "no-referrer"> </script>
+
+  <style>
+    #query {
+      height: 150px;
+    }
+    .starthidden{
+      visibility : hidden
+    }
+    footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: auto;
+        padding:10px;
+        background-color: rgb(55, 49, 49);
+        color:white;
+     }
+     body {
+        background-color: #efeee5;
+     }
+     [type=radio] { 
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      /* IMAGE STYLES */
+      [type=radio] + img {
+        cursor: pointer;
+      }
+
+      /* CHECKED STYLES */
+      [type=radio]:checked + img {
+        outline: 2px solid rgb(0, 238, 255);
+      }
+
+      .profile {
+        border: none;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        margin: 0 3em 0 0;
+        float:left;
+        width:50px
+      }
+  </style>
+
+</head>
+<body>
+  <div class="contain-to-grid">
+    <nav class="top-bar" data-topbar>
+      <ul class="title-area">
+        <li class="name">
+          <h1><a href="/applications.html">Enabling thematic discussions in the metaverse via Knowledge Graph</a></h1>
+        </li>
+        <li class="toggle-topbar menu-icon">
+          <a href="#">
+            <span>Menu</span>
+          </a>
+        </li>
+      </ul>
+
+      <section class="top-bar-section">
+        <!-- Right Nav Section -->
+        <ul class="right">
+          <li class=""><a target="_blank" href="/applications.html">Home</a></li>
+          <li class=""><a target="_blank" href="/examples.html">Examples</a></li>
+          <li class=""><a target="_blank" href="/guide.html">Guide</a></li>
+        </ul>
+      </section>
+    </nav>
+  </div>
+  <div id="wrapper">
+    <div class="hero">
+       <div class="row">
+         <div class="large-12 columns">
+            <form method="GET">
+              <label for="query_name"> Query name/goal: </label> 
+              <input required type="text" id="query_name" name="query_name"> 
+              
+              <label for="query_name"> Preview: </label> 
+              <input required type="text" id="preview" name="preview"> 
+
+              <label for="endpoint"> SPARQL Endpoint: </label> 
+              <input required type="text" id="endpoint" name="endpoint"> 
+              
+              <label for="name"> 
+                Query results <b>must</b> contain 
+                <em>subject, subjectLabel, subjectDescription, predicate, predicateLabel, object, objectLabel.</em>
+                Further details at <a target="_blank" href="/guide.html">Guide</a>
+              </label>
+              <textarea id="query" name="query" rows=14 cols="50" required > </textarea>
+              
+
+              <div>
+                <label for="profile"> 
+                  Choose your graphic profile: 
+                </label>
+
+                <label class="radio-inline">
+                  <input type="radio" name="profile" value="Stars" checked>
+                  <img src="img/stars.png" class="profile" alt="stars">
+                </label>
+                
+                <label class="radio-inline">
+                  <input type="radio" name="profile" value="Clouds" >
+                  <img src="img/clouds.png" class="profile" alt="cloud">
+                </label>
+              </div>
+
+
+              <div><button name="submit" type="submit" onclick="storeQueryResults()">Submit</button>  </div>
+
+              <p id="success" class="starthidden" style="color:rgb(53, 166, 95)">Upload with success!</p>
+              <p id="failure" class="starthidden" style="color:rgb(199, 41, 41)">Upload failed!</p>
+            </form>           
+          </div>
+       </div>
+    </div>
+    <div id="lowerContainer" class="row">
+      <div id="content" class="large-12 columns">
+          <!-- @@BITNAMI_MODULE_PLACEHOLDER@@ -->
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="large-12 columns" style="color:white">
+      It support the demo entitled <em>Enabling thematic discussions in the metaverse via Knowledge Graphs</em> under revision at ESWC 2023. </br>
+      If you are interested in the project, do not exitate to contact me at <u>mapellegrino@unisa.it</u>
+    </div>    
+  </footer>
+
+  <script>
+    function storeQueryResults() {
+      if(document.getElementById("query_name").value == "" || 
+      document.getElementById("preview").value == "" || 
+      document.getElementById("endpoint").value == "" || 
+      document.getElementById("query").value.trim() == "")
+        return false;
+
+      event.preventDefault();
+      query = document.getElementById("endpoint").value + "?query="+encodeURIComponent(document.getElementById("query").value)+"&format=csv";
+      console.log(query)
+
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            const content = xhttp.responseText;
+
+            var ele = document.getElementsByName('profile');
+            var profile;
+          
+            for(i = 0; i < ele.length; i++) {
+                if(ele[i].checked)
+                  profile = ele[i].value;
+            }
+
+            uploadData(content, document.getElementById("query_name").value, document.getElementById("preview").value, profile)
+          }
+      };
+      xhttp.open("GET", query, true);
+      xhttp.send();
+    }
+
+    async function uploadData(content, queryName, preview, profile){
+      
+      var formData = new FormData();
+      formData.append('data', content);
+      formData.append('name', queryName);
+      formData.append('preview', preview);
+      formData.append('profile', profile)
+
+
+      const response = await fetch('/storeData.php', {
+        method: "POST", 
+        body: formData
+      })
+
+      const feedback = await response.text();
+      console.log(feedback);
+      document.getElementById(feedback).style.visibility = "visible";
+      setTimeout(() => { document.getElementById(feedback).style.visibility = "hidden"; }, 10000);
+
+    }
+    </script>
+</body>
+</html>
